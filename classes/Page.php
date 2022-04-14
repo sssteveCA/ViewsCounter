@@ -195,23 +195,5 @@ SQL;
         return $ok;
     }//if($this->isRobot() === false)
 
-    //increase the value of the views of page by 1(if page already exists)
-    /*private function incViews(){
-        $ok = false;
-        $this->query = <<<SQL
-UPDATE `{$this->table}` SET `n_views` = `n_views` + 1 WHERE `id` = '{$this->id}';
-SQL;
-        $update = $this->wpdb->query($this->query);
-        if($update !== false){
-            $this->query = <<<SQL
-SELECT `n_views` FROM `{$this->table}` WHERE `id` = '{$this->id}';
-SQL;
-            $this->n_views = $this->wpdb->get_var($this->query);
-            $this->queries[] = $this->query;
-            $ok = true;
-        }
-        $this->queries[] = $this->query;
-        return $ok;
-    }*/
 }
 ?>
