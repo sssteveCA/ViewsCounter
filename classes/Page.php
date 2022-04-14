@@ -89,6 +89,9 @@ SQL;
             case PageError::NOROBOTLIST:
                 $this->error = PageError::NOROBOTLIST_MSG;
                 break;
+            case PageError::ISROBOT:
+                $this->error = PageError::ISROBOT_MSG;
+                break;
             default:
                 $this->error = null;
                 break;
@@ -191,6 +194,11 @@ SQL;
         $this->queries[] = $this->query;
         /*$log = "Query => {$this->query}\r\n Errore => {$this->wpdb->last_error}\r\n";
         file_put_contents(Page::$logDir,$log,FILE_APPEND);*/
+        }//if($this->isRobot() === false){
+        else{
+            $this->errno = PageError::ISROBOT;
+            $log = "Il visitatore è un robot => {$this->userAgent}\r\n";
+            file_put_contents(Page::$logDir,$log,FILE_APPEND);
         }
         return $ok;
     }//if($this->isRobot() === false)

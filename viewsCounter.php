@@ -110,22 +110,18 @@ function vc_register_my_session()
 add_shortcode('vc_total_views','vc_total');
 function vc_total(){
     global $logDir;
-    $log = "";
     $str = "";
-    global $wpdb;
     try{
         $cont = new Counter();
-        $totale = $cont->getTotal();
-        if($cont->getErrno() == 0){
-            $str = '<p id="vc_totale">Totale visualizzazioni: '.$totale.'</p>';
-        }
-        else{
-            $log .= $cont->getError()."\r\n";
+        //get html shortcode 
+        $str = $cont->shortcode();
+        if($cont->getErrno() != 0){
+            $log = $cont->getError()."\r\n";
             file_put_contents($logDir,$log,FILE_APPEND);
         }
     }
     catch(Exception $e){
-        $log .= $e->getMessage()."\r\n";
+        $log = $e->getMessage()."\r\n";
         file_put_contents($logDir,$log,FILE_APPEND);
     }
     return $str;

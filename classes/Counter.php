@@ -12,6 +12,7 @@ class Counter implements CounterError{
     private $wpdb; //Wordpress database handle
     private $errno; //error code
     private $error; //error message
+    private $shortcode; //html shortcode of site total views
     //Log file path
     private static $logDir = ABSPATH.'/wp-content/viewsCounterLog.txt'; 
     
@@ -27,6 +28,7 @@ class Counter implements CounterError{
         $this->errno = 0;
         $this->error = null;
         $this->queries = array();
+        $this->shortcode = "";
     }
 
     //Check if $this->table table exists
@@ -142,7 +144,7 @@ SQL;
         return $pages;
     }
 
-    //restituisce l'oggetto Page che ha l'url specificato
+    //return Page object that has url $url
     public function getPageByUrl($url){
         $page = null;
         $this->errno = 0;
@@ -252,6 +254,18 @@ SQL;
         }
         $this->queries[] = $this->query;
         return $pages;
+    }// public function getPagesByViews($views){
+
+    //Shortcode string to display total views of the entire site
+    public function shortcode(){
+        $this->errno = 0;
+        $shortcode = "";
+        $this->getTotal();
+        if($this->errno == 0){
+            $shortcode = "<p id=\"vc_totale\">Totale visualizzazioni: {$this->total}</p>";
+        }
+        $this->shortcode = $shortcode;
+        return $this->shortcode;
     }
 }
 
