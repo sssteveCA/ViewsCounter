@@ -37,10 +37,10 @@ class Counter implements CounterError{
         $this->query = <<<SQL
 SHOW TABLES LIKE '{$this->table}';
 SQL;
+        $this->queries[] = $this->query;
         if($this->wpdb->get_var($this->query) == $this->table){
             $exists = true; //table exists
         }
-        $this->queries[] = $this->query;
         return $exists;
     }
 
@@ -49,12 +49,12 @@ SQL;
         $this->query = <<<SQL
 SELECT SUM(`n_views`) AS `total` FROM `{$this->table}`;
 SQL;
+        $this->queries[] = $this->query;
         $this->total = $this->wpdb->get_var($this->query);
         if($this->total === null){
             //The query returned no result
             $this->errno = CounterError::NORESULT;
         }
-        $this->queries[] = $this->query;
         return $this->total;
     }
     public function getQuery(){return $this->query;}
@@ -80,16 +80,15 @@ SQL;
         $page = null;
         $this->errno = 0;
         $this->query = $this->wpdb->prepare("SELECT * FROM `{$this->table}` WHERE `id` = %d",$id);
+        $this->queries[] = $this->query;
         $pageData = $this->wpdb->get_results($this->query,ARRAY_A);
-        $log = "pageData => ".var_export($pageData,true)."\r\n";
-        //file_put_contents(Vc_contatore::$logDir,$log,FILE_APPEND);
+        //file_put_contents(Vc_contatore::$logDir,"pageData => ".var_export($pageData,true)."\r\n",FILE_APPEND);
         if($pageData !== null){
             $page = new Page($pageData[0]);
         }
         else{
             $this->errno = CounterError::NORESULT;
         }
-        $this->queries[] = $this->query;
         return $page;
     }
     ////Returns a Page object if there is a row with page_id $page_id
@@ -97,18 +96,15 @@ SQL;
         $page = null;
         $this->errno = 0;
         $this->query = $this->wpdb->prepare("SELECT * FROM `{$this->table}` WHERE `page_id` = %d",$page_id);
+        $this->queries[] = $this->query;
         $pageData = $this->wpdb->get_results($this->query,ARRAY_A);
-        $log = "";
-        $log .= "pageData => ".var_export($pageData,true)."\r\n";
         if($pageData !== null){
             $page = new Page($pageData[0]);
-            $log .= "page => ".var_export($page,true)."\r\n";
         }
         else{
             $this->errno = CounterError::NORESULT;
         }
         //file_put_contents(Vc_contatore::$logDir,$log,FILE_APPEND);
-        $this->queries[] = $this->query;
         return $page;
     }
     //returns an Array of Page objects that have title $title
@@ -116,10 +112,10 @@ SQL;
         $page = null;
         $this->errno = 0;
         $pages = array();
-        $log = "";
         $this->query = <<<SQL
 SELECT `id` FROM `{$this->table}` ORDER BY `id` ASC;
 SQL;
+        $this->queries[] = $this->query;
         //returns the id list
         $ids = $this->wpdb->get_col($this->query);
         if(count($ids) > 0){
@@ -136,9 +132,7 @@ SQL;
         else{
             $this->errno = Counter::NORESULT;
         }
-        $log = "pages =>".var_export($pages,true)."\r\n";
-        //file_put_contents(Vc_contatore::$logDir,$log,FILE_APPEND);
-        $this->queries[] = $this->query;
+        //file_put_contents(Vc_contatore::$logDir,"pages =>".var_export($pages,true)."\r\n",FILE_APPEND);
         return $pages;
     }
 
@@ -147,6 +141,7 @@ SQL;
         $page = null;
         $this->errno = 0;
         $this->query = $this->wpdb->prepare("SELECT * FROM `{$this->table}` WHERE `url` = '%s",$url);
+        $this->queries[] = $this->query;
         $pageData = $this->wpdb->get_results($this->query,ARRAY_A);
         file_put_contents(Counter::$logDir,"Counter. php getPage ByUrl pageData => ".var_export($pageData,true)."\r\n",FILE_APPEND);
         if($pageData != null){
@@ -155,7 +150,6 @@ SQL;
         else{
             $this->errno = CounterError::NORESULT;
         }
-        $this->queries[] = $this->query;
         return $page;
     }
     //returns an array of Page objects based on the $views array options
@@ -166,6 +160,7 @@ SQL;
         $this->query = <<<SQL
 SELECT `id` FROM `{$this->table}` ORDER BY `id` ASC;
 SQL;
+        $this->queries[] = $this->query;
         //returns the id list
         $ids = $this->wpdb->get_col($this->query);
         if(count($ids) > 0){
@@ -250,7 +245,6 @@ SQL;
         else{
             $this->errno = CounterError::NORESULT;
         }
-        $this->queries[] = $this->query;
         return $pages;
     }// public function getPagesByViews($views){
 

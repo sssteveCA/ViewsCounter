@@ -65,10 +65,10 @@ class Page implements PageError,Constants{
         $this->query = <<<SQL
 SHOW TABLES LIKE '{$this->table}';
 SQL;
+        $this->queries[] = $this->query;
         if($this->wpdb->get_var($this->query) == $this->table){
             $exists = true; //table exists
         }
-        $this->queries[] = $this->query;
         return $exists;
     }
 
@@ -116,17 +116,13 @@ SQL;
         $this->errno = 0;
         //$rList is the array in robotsList.php that contains list of robots to exclude from views counting
         if(isset($this->robots_list)){
-            $log = "funzione isRobot() di Page\r\n";
-            file_put_contents(Page::$logDir,$log,FILE_APPEND);
+            file_put_contents(Page::$logDir,"funzione isRobot() di Page\r\n",FILE_APPEND);
             foreach($this->robots_list as $robot){
-                $log = "foreach robot => {$robot}\r\n";
-                file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                file_put_contents(Page::$logDir,"foreach robot => {$robot}\r\n",FILE_APPEND);
                 $Ebot = preg_quote($robot,'/');
-                $log = "foreach Ebot => {$Ebot}\r\n";
-                file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                file_put_contents(Page::$logDir,"foreach Ebot => {$Ebot}\r\n",FILE_APPEND);
                 if(preg_match('/'.$Ebot.'/i',$this->userAgent)){
-                    $log = "preg_match di {$Ebot} con {$this->userAgent}\r\n";
-                    file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                    file_put_contents(Page::$logDir,"preg_match di {$Ebot} con {$this->userAgent}\r\n",FILE_APPEND);
                     $isRobot = true;
                     break;
                 }
@@ -134,8 +130,7 @@ SQL;
         }//if(isset($rList)){
         else{
             $this->errno = PageError::NOROBOTLIST;
-            $log = "Page isRobot() no robots list\r\n";
-            file_put_contents(Page::$logDir,$log,FILE_APPEND);
+            file_put_contents(Page::$logDir,"Page isRobot() no robots list\r\n",FILE_APPEND);
         }
         return $isRobot;
     }
@@ -148,11 +143,9 @@ SQL;
     public function countableView(){
         $countable = false;
         $this->errno = 0;
-        $log = "Page countableViews()\r\n";
-        file_put_contents(Page::$logDir,$log,FILE_APPEND);
+        file_put_contents(Page::$logDir,"Page countableViews()\r\n",FILE_APPEND);
         $robot = $this->isRobot();
-        $log = "Page countableViews() robots => {$robot}\r\n";
-        file_put_contents(Page::$logDir,$log,FILE_APPEND);
+        file_put_contents(Page::$logDir,"Page countableViews() robots => {$robot}\r\n",FILE_APPEND);
         if(!$robot){
             //Visitors is not a crawler
             if(!$this->user_logged && in_array($this->page_id,$this->session_array) && $this->page_id != 0)
@@ -160,11 +153,9 @@ SQL;
                 //If user is not logged and the page isn't already visited in this session
                 $insert = $this->insertRow();
                 if($insert){
-                    $log = "Page countableViews() session_array prima => ".var_export($this->session_array,true)."\r\n";
-                    file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                    file_put_contents(Page::$logDir,"Page countableViews() session_array prima => ".var_export($this->session_array,true)."\r\n",FILE_APPEND);
                     $this->session_array[][] = $this->page_id;
-                    $log = "Page countableViews() session_array dopo => ".var_export($this->session_array,true)."\r\n";
-                    file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                    file_put_contents(Page::$logDir,"Page countableViews() session_array dopo => ".var_export($this->session_array,true)."\r\n",FILE_APPEND);
                     $countable = true;
                 }//if($insert){
             }//if(!$this->user_logged && in_array($this->page_id,$this->session_array) && $this->page_id != 0){
@@ -186,6 +177,7 @@ SQL;
         $this->query = <<<SQL
 SELECT * FROM `{$this->table}` WHERE `id` = {$this->id};
 SQL;
+        $this->queries[] = $this->query;
         $result = $this->wpdb->get_results($this->query,ARRAY_A);
         $logDir = ABSPATH.'wp-content/plugins/viewsCounterClass/log.txt';
         $log = "Pagina Query =>".$this->query."\r\n";
@@ -201,7 +193,6 @@ SQL;
         else{
             $this->errno = PageError::NOTSETTED;
         }
-        $this->queries[] = $this->query;
         return $ok;
     }
 
@@ -212,6 +203,7 @@ SQL;
         $this->query = <<<SQL
 SELECT * FROM `{$this->table}` WHERE `page_id` = $this->page_id};
 SQL;
+        $this->queries[] = $this->query;
         $result = $this->wpdb->get_results($this->query,ARRAY_A);
         if($result !== null){
             $this->id = $result['page_id'];
@@ -223,7 +215,6 @@ SQL;
         else{
             $this->errno = PageError::NOTSETTED;
         }
-        $this->queries[] = $this->query;
         return $ok;
     }
 
@@ -239,12 +230,12 @@ VALUES('%d','%s','%s',1)
 ON DUPLICATE KEY UPDATE `n_views` = `n_views` + 1
 SQL;
         $this->query = $this->wpdb->prepare($q,$this->page_id,$this->title,$this->url);
+        $this->queries[] = $this->query;
         $insert = $this->wpdb->query($this->query);
         if($insert !== false)$ok = true;
         else{
             $this->errno = PageError::NOTWRITTEN;
         }
-        $this->queries[] = $this->query;
         /*$log = "Query => {$this->query}\r\n Errore => {$this->wpdb->last_error}\r\n";
         file_put_contents(Page::$logDir,$log,FILE_APPEND);*/
         return $ok;

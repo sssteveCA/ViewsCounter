@@ -103,13 +103,11 @@ SQL;
         $this->queries[] = $this->query;
         $delete = $this->wpdb->query($this->query);
         if($delete == true){
-            $log = "Table uninistall tabella eliminata";
-            file_put_contents(Table::$logDir,$log,FILE_APPEND);
+            file_put_contents(Table::$logDir,"Table uninistall tabella eliminata",FILE_APPEND);
             $uninstalled = true;
         }
         else{
-            $log = "Table uninistall tabella non eliminata";
-            file_put_contents(Table::$logDir,$log,FILE_APPEND);
+            file_put_contents(Table::$logDir,"Table uninistall tabella non eliminata",FILE_APPEND);
             $this->errno = TableError::NOTREMOVED;
         }
         return $uninstalled;

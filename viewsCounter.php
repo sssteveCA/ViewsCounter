@@ -41,21 +41,17 @@ function vc_count(){
         'url' => $url,
         'user_logged' => is_user_logged_in()    
     );
-    $log = "vc_count rList => ".var_export($rList,true)."\r\n";
-    //file_put_contents($logDir,$log,FILE_APPEND);
+    //file_put_contents($logDir, "vc_count rList => ".var_export($rList,true)."\r\n",FILE_APPEND);
     if(isset($rList)){
         $pageA['robots_list'] = $rList;
-        $log = "vc_count robots_list esiste\r\n";
-        file_put_contents($logDir,$log,FILE_APPEND);
+        file_put_contents($logDir,"vc_count robots_list esiste\r\n",FILE_APPEND);
     }
     else{
-        $log = "vc_count robots_list non esiste\r\n";
-        file_put_contents($logDir,$log,FILE_APPEND);
+        file_put_contents($logDir,"vc_count robots_list non esiste\r\n",FILE_APPEND);
     }
     try{
         $page = new Page($pageA);
-        $log = "vc_count User Agent => ".var_export($page->getUserAgent(),true)."\r\n";
-        file_put_contents($logDir,$log,FILE_APPEND);
+        file_put_contents($logDir,"vc_count User Agent => ".var_export($page->getUserAgent(),true)."\r\n",FILE_APPEND);
         $count = $page->countableView();
         if($count){
             $_SESSION['pages'][] = $page->getSessionArray();
@@ -63,12 +59,11 @@ function vc_count(){
         else{
             $error = $page->getError();
             $log = "vc_count count error => {$error}\r\n";
-            file_put_contents($logDir,$log,FILE_APPEND);
+            file_put_contents($logDir,"vc_count count error => {$error}\r\n",FILE_APPEND);
         }
     }
     catch(Exception $e){
-        $log .= "Errore Page: ".$e->getMessage()."\r\n";
-        file_put_contents($logDir,$log,FILE_APPEND);
+        file_put_contents($logDir,"Errore Page: ".$e->getMessage()."\r\n",FILE_APPEND);
     } 
 }
 
@@ -116,13 +111,11 @@ function vc_total(){
         //get html shortcode 
         $str = $cont->shortcode();
         if($cont->getErrno() != 0){
-            $log = $cont->getError()."\r\n";
-            file_put_contents($logDir,$log,FILE_APPEND);
+            file_put_contents($logDir,$cont->getError()."\r\n",FILE_APPEND);
         }
     }
     catch(Exception $e){
-        $log = $e->getMessage()."\r\n";
-        file_put_contents($logDir,$log,FILE_APPEND);
+        file_put_contents($logDir,$e->getMessage()."\r\n",FILE_APPEND);
     }
     return $str;
 }
