@@ -41,6 +41,8 @@ function vc_count(){
         'url' => $url,
         'user_logged' => is_user_logged_in()    
     );
+    file_put_contents($logDir,"vc_count pageA => ".var_export($pageA,true)."\r\n",FILE_APPEND);
+    //file_put_contents($logDir,"vc_count SESSION prima => ".var_export($_SESSION['pages'],true)."\r\n",FILE_APPEND);
     //file_put_contents($logDir, "vc_count rList => ".var_export($rList,true)."\r\n",FILE_APPEND);
     if(isset($rList)){
         $pageA['robots_list'] = $rList;
@@ -51,10 +53,11 @@ function vc_count(){
     }
     try{
         $page = new Page($pageA);
-        file_put_contents($logDir,"vc_count User Agent => ".var_export($page->getUserAgent(),true)."\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"vc_count User Agent => ".var_export($page->getUserAgent(),true)."\r\n",FILE_APPEND);
         $count = $page->countableView();
         if($count){
-            $_SESSION['pages'][] = $page->getSessionArray();
+            $_SESSION['pages'] = $page->getSessionArray();
+            //file_put_contents($logDir,"vc_count SESSION dopo => ".var_export($_SESSION['pages'],true)."\r\n",FILE_APPEND);
         }//if($count){
         else{
             $error = $page->getError();
@@ -89,16 +92,23 @@ function vc_delete_table(){
 add_action('init', 'vc_register_my_session');
 function vc_register_my_session()
 {
+    global $logDir;
     ob_start();
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
-    if( !session_id() )
+    session_start();
+    $session_id = session_id();
+    if( !$session_id )
     {
-        session_start();
+        file_put_contents($logDir,"vc_register_my_session() session id non esiste\r\n",FILE_APPEND);
         if(!isset($_SESSION['pages'])){
             $_SESSION['pages'] = array();
         }
+    }
+    else{
+        file_put_contents($logDir,"vc_register_my_session() session id esiste\r\n",FILE_APPEND);
+        file_put_contents($logDir,"vc_register_my_session() session id {$session_id}\r\n",FILE_APPEND);
     }
 }
 
