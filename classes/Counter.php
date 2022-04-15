@@ -14,7 +14,7 @@ class Counter implements CounterError{
     private $error; //error message
     private $shortcode; //html shortcode of site total views
     //Log file path
-    private static $logDir = ABSPATH.'/wp-content/viewsCounterLog.txt'; 
+    private static $logDir = ABSPATH.'wp-content/viewsCounterLog.txt'; 
     
     public function __construct($args = array()){
         global $wpdb;

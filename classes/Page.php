@@ -22,7 +22,7 @@ class Page implements PageError,Constants{
     private $errno; //error code
     private $error; //error message
     //path of log file;
-    private static $logDir = ABSPATH.'/wp-content/viewsCounterLog.txt'; 
+    private static $logDir = ABSPATH.'wp-content/viewsCounterLog.txt'; 
     //unique fields array
     public static $fields = array('id','page_id_get');
 

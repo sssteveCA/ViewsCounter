@@ -14,7 +14,7 @@ class Table implements TableError,Constants{
     private $queries; //SQL list
     private $errno; //error code
     private $error; //error message
-    private static $logDir = ABSPATH.'/wp-content/viewsCounterLog.txt'; 
+    private static $logDir = ABSPATH.'wp-content/viewsCounterLog.txt'; 
 
     public function __construct($dati = array())
     {
