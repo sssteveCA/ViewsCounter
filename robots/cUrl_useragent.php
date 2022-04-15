@@ -1,9 +1,13 @@
 <?php
 
+require_once('../interfaces/Constants.php');
+
+use ViewsCounter\Interfaces\Constants;
+
 $msg = "";
 $cUrl = curl_init();
 
-curl_setopt($cUrl,CURLOPT_URL,"http://www.robotstxt.org/db.html");
+curl_setopt($cUrl,CURLOPT_URL,Constants::URL_ROBOTS);
 curl_setopt($cUrl,CURLOPT_RETURNTRANSFER,true);
 curl_setopt($cUrl,CURLOPT_HEADER,false);
 curl_setopt($cUrl,CURLOPT_CONNECTTIMEOUT, 10);
@@ -17,17 +21,16 @@ curl_close($cUrl);
 
 
 if($list !== false){
-    $inizioOl = strstr($list,'<ol>');
-    if($inizioOl !== false){
-        $contenutoOl = strstr($inizioOl,'</ol>',true);
-        if($contenutoOl !== false){
-            //file_put_contents('page.html',$contenutoOl,FILE_APPEND);
-            $exp = '';
+    $olStart = strstr($list,'<ol>');
+    if($olStart !== false){
+        $olContent = strstr($olStart,'</ol>',true);
+        if($olContent !== false){
+            //file_put_contents('page.html',$olContent,FILE_APPEND);
             $expQ = '/<li><a href=".+">(.+)<\/a><\/li>/i';
             //file_put_contents('page.html',$expQ."\r\n",FILE_APPEND);
-            $robots = preg_match_all($expQ,$contenutoOl,$robotsList,PREG_PATTERN_ORDER);
+            $robots = preg_match_all($expQ,$olContent,$robotsList,PREG_PATTERN_ORDER);
             if($robots !== false){
-                $file_content = "<?php\r\n".'$rList='.var_export($robotsList[1],true).';'."\r\n?>";
+                $file_content = "<?php\r\n".'$rList = '.var_export($robotsList[1],true).';'."\r\n?>";
                 file_put_contents('robotList.php',$file_content);
                 $msg = "Operazione completata con successo";
             }
