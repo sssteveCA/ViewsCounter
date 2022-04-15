@@ -18,6 +18,8 @@ class Page implements PageError,Constants{
     private $url; //table url column
     private $n_views; //table number of views column(total views of specific page)
     private $userAgent; 
+    private $user_logged; //true if visitors is a logged user
+    private $session_array; //array from $_SESSION that contains user visited pages
     private $errno; //error code
     private $error; //error message
     //path of log file;
@@ -52,6 +54,8 @@ class Page implements PageError,Constants{
             $this->page_id = isset($args['page_id']) ? $args['page_id'] : null;
             $this->title = isset($args['title']) ? $args['title'] : null;
             $this->url = isset($args['url']) ? $args['url'] : null;
+            $this->user_logged = isset($args['user_logged']) ? $args['user_logged'] : false;
+            $this->session_array = isset($args['session_array']) ? $args['session_array'] : array();
         }
     }
 
@@ -77,6 +81,7 @@ SQL;
     public function getQuery(){return $this->query;}
     public function getQueries(){return $this->queries;}
     public function getUserAgent(){return $this->userAgent;}
+    public function getSessionArray(){return $this->session_array;}
     public function getErrno(){return $this->errno;}
     public function getError(){
         switch($this->errno){
@@ -92,12 +97,17 @@ SQL;
             case PageError::ISROBOT:
                 $this->error = PageError::ISROBOT_MSG;
                 break;
+            case PageError::NOTCOUNTABLEVIEW:
+                $this->error = PageError::NOTCOUNTABLEVIEW_MSG;
+                break;
             default:
                 $this->error = null;
                 break;
         }
         return $this->error;
     }
+
+    public function isLogged(){return $this->user_logged;}
 
     //check if visitor is a bot/crawler/spider
     private function isRobot(){
@@ -121,9 +131,39 @@ SQL;
         return $robot;
     }
 
-    public function setTable($table){
-        $this->table = $table;
+    public function setSessionArray($session_array){$this->session_array = $session_array;}
+    public function setTable($table){$this->table = $table;}
+    public function setLogged($user_logged){$this->user_logged = $user_logged;}
+
+    //Check if visitors is not a rboto a guest or the page is not already visited in this session
+    public function countableViews(){
+        $countable = false;
+        $this->errno = 0;
+        if(!$this->isRobot()){
+            //Visitors is not a crawler
+            if(!$this->user_logged && in_array($this->page_id,$this->session_array) && $this->page_id != 0)
+            {
+                //If user is not logged and the page isn't already visited in this session
+                $insert = $this->insertRow();
+                if($insert){
+                    $log = "Page countableViews() session_array prima => ".var_export($this->session_array,true)."\r\n";
+                    file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                    $this->session_array['pages'][] = $this->page_id;
+                    $log = "Page countableViews() session_array dopo => ".var_export($this->session_array,true)."\r\n";
+                    file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                    $countable = true;
+                }//if($insert){
+            }//if(!$this->user_logged && in_array($this->page_id,$this->session_array) && $this->page_id != 0){
+            else{
+                $this->errno = PageError::NOTCOUNTABLEVIEW;
+            }
+        }//if(!$this->isRobot()){
+        else{
+            $this->errno = PageError::ISROBOT;
+        }
+        return $countable;
     }
+
 
     /*Search in table the row with id $this->id and insert all the values in their respective properties*/
     private function setValuesById(){
@@ -175,7 +215,7 @@ SQL;
 
     /*When a site page is visited the first time a new row
      in the database with that page info is created or the number of views is increased*/
-    public function InsertRow(){
+    public function insertRow(){
         $ok = false;
         $this->errno = 0;
         if($this->isRobot() === false){

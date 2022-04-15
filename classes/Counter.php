@@ -72,9 +72,8 @@ SQL;
         return $this->error;
     }
 
-    public function setTable($table){
-        $this->table = $table;
-    }
+    public function setTable($table){$this->table = $table;}
+
 
     //Returns a Page object if there is a row with id $id
     public function getPageById($id){

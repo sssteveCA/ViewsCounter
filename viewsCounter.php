@@ -44,7 +44,7 @@ function vc_count(){
     );
     $log .= "Array page => ".var_export($pageA,true)."\r\n";
     $guest = !is_user_logged_in();
-    $guest = true;
+    //$guest = true;
     $log .= "PRIMA => ".var_export($_SESSION['cv_visite'],true)."\r\n";
     //utente non loggato e che nella stessa sessione non ha visitto la pagina
     if($guest && !in_array($pageA['page_id'],$_SESSION['cv_visite']) && $pageA['page_id'] != 0){
