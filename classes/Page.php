@@ -13,7 +13,6 @@ class Page implements PageError,Constants{
     private $table; //MySql table
     private $id; //table id column 
     private $page_id; //wordpress page id column
-    private $page_id_get; 
     private $title; //table title column
     private $url; //table url column
     private $n_views; //table number of views column(total views of specific page)
@@ -36,8 +35,6 @@ class Page implements PageError,Constants{
             throw new \Exception("la tabella {$this->table} non esiste");
         }
         $this->id = isset($args['id']) ? $args['id'] : null;
-        $this->page_id_get = isset($args['page_id_get']) ? $args['page_id_get'] : null;
-        $this->userAgent = isset($args['userAgent']) ? $args['userAgent'] : $_SERVER['HTTP_USER_AGENT'];
         $this->query = "";
         $this->queries = array();
         $this->errno = 0;
@@ -52,10 +49,11 @@ class Page implements PageError,Constants{
         //Don't send a SQL query
         else{
             $this->page_id = isset($args['page_id']) ? $args['page_id'] : null;
+            $this->session_array = isset($args['session_array']) ? $args['session_array'] : array();
             $this->title = isset($args['title']) ? $args['title'] : null;
             $this->url = isset($args['url']) ? $args['url'] : null;
+            $this->userAgent = isset($args['userAgent']) ? $args['userAgent'] : $_SERVER['HTTP_USER_AGENT'];
             $this->user_logged = isset($args['user_logged']) ? $args['user_logged'] : false;
-            $this->session_array = isset($args['session_array']) ? $args['session_array'] : array();
         }
     }
 
@@ -136,7 +134,7 @@ SQL;
     public function setLogged($user_logged){$this->user_logged = $user_logged;}
 
     //Check if visitors is not a rboto a guest or the page is not already visited in this session
-    public function countableViews(){
+    public function countableView(){
         $countable = false;
         $this->errno = 0;
         if(!$this->isRobot()){
@@ -148,7 +146,7 @@ SQL;
                 if($insert){
                     $log = "Page countableViews() session_array prima => ".var_export($this->session_array,true)."\r\n";
                     file_put_contents(Page::$logDir,$log,FILE_APPEND);
-                    $this->session_array['pages'][] = $this->page_id;
+                    $this->session_array[][] = $this->page_id;
                     $log = "Page countableViews() session_array dopo => ".var_export($this->session_array,true)."\r\n";
                     file_put_contents(Page::$logDir,$log,FILE_APPEND);
                     $countable = true;

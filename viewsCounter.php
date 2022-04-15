@@ -39,37 +39,27 @@ function vc_count(){
     $url = $_SERVER['REQUEST_URI'];
     $pageA = array(
         'page_id' => $post->ID,
+        'session_array' => $_SESSION['pages'],
         'titolo' => $post->post_title,
-        'url' => $url
+        'url' => $url,
+        'user_logged' => is_user_logged_in()    
     );
-    $log .= "Array page => ".var_export($pageA,true)."\r\n";
-    $guest = !is_user_logged_in();
-    //$guest = true;
-    $log .= "PRIMA => ".var_export($_SESSION['cv_visite'],true)."\r\n";
-    //utente non loggato e che nella stessa sessione non ha visitto la pagina
-    if($guest && !in_array($pageA['page_id'],$_SESSION['cv_visite']) && $pageA['page_id'] != 0){
-        try{
-            $page = new Page($pageA);
-            if($page->getErrno() == 0){
-                $page->InsertRow();
-                if($page->getErrno() == 0){
-                    $_SESSION['cv_visite'][] = $pageA['page_id'];
-                    $log .= "DOPO => ".var_export($_SESSION['cv_visite'],true)."\r\n";
-                }
-                else{
-                    $log .= $page->getError()."\r\n";  
-                }
-            }
-            else{
-                $log .= $page->getError()."\r\n";              
-            }
-            
+    try{
+        $page = new Page($pageA);
+        $count = $page->countableView();
+        if($count){
+            $_SESSION['pages'][] = $page->getSessionArray();
+        }//if($count){
+        else{
+            $error = $page->getError();
+            $log = "vc_count count error => {$error}\r\n";
+            file_put_contents($logDir,$log,FILE_APPEND);
         }
-        catch(Exception $e){
-            $log .= "Errore Page: ".$e->getMessage()."\r\n";
-        }
-    }//if($guest && !in_array($pageA['page_id'],$_SESSION['cv_visite']))
-    file_put_contents($logDir,$log,FILE_APPEND);
+    }
+    catch(Exception $e){
+        $log .= "Errore Page: ".$e->getMessage()."\r\n";
+        file_put_contents($logDir,$log,FILE_APPEND);
+    } 
 }
 
 register_activation_hook(__FILE__,'vc_create_table');
@@ -101,8 +91,8 @@ function vc_register_my_session()
     if( !session_id() )
     {
         session_start();
-        if(!isset($_SESSION['cv_visite'])){
-            $_SESSION['cv_visite'] = array();
+        if(!isset($_SESSION['pages'])){
+            $_SESSION['pages'] = array();
         }
     }
 }
