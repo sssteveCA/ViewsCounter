@@ -125,6 +125,8 @@ SQL;
         }//if(isset($rList)){
         else{
             $this->errno = PageError::NOROBOTLIST;
+            $log = "Page isRobot() no robots list\r\n";
+            file_put_contents(Page::$logDir,$log,FILE_APPEND);
         }
         return $robot;
     }
@@ -213,12 +215,11 @@ SQL;
 
     /*When a site page is visited the first time a new row
      in the database with that page info is created or the number of views is increased*/
-    public function insertRow(){
+    private function insertRow(){
         $ok = false;
         $this->errno = 0;
-        if($this->isRobot() === false){
-            $this->errno = 0;
-            $q = <<<SQL
+        $this->errno = 0;
+        $q = <<<SQL
 INSERT INTO `{$this->table}` (`page_id`,`title`,`url`,`n_views`) 
 VALUES('%d','%s','%s',1) 
 ON DUPLICATE KEY UPDATE `n_views` = `n_views` + 1
@@ -232,12 +233,6 @@ SQL;
         $this->queries[] = $this->query;
         /*$log = "Query => {$this->query}\r\n Errore => {$this->wpdb->last_error}\r\n";
         file_put_contents(Page::$logDir,$log,FILE_APPEND);*/
-        }//if($this->isRobot() === false){
-        else{
-            $this->errno = PageError::ISROBOT;
-            $log = "Il visitatore è un robot => {$this->userAgent}\r\n";
-            file_put_contents(Page::$logDir,$log,FILE_APPEND);
-        }
         return $ok;
     }//if($this->isRobot() === false)
 
