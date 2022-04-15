@@ -88,8 +88,7 @@ CREATE TABLE `{$this->table}` (
 SQL;
         $this->queries[] = $this->query;
         $log = dbDelta($this->query);
-        $output = "Table DbDelta => ".var_export($log,true)."\r\n";
-        file_put_contents(Table::$logDir,$output,FILE_APPEND);
+        file_put_contents(Table::$logDir,"Table DbDelta => ".var_export($log,true)."\r\n",FILE_APPEND);
         $activated = true;
         return $activated;
     }

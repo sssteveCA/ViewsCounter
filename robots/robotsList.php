@@ -1,5 +1,5 @@
 <?php
-$rList=array (
+$rList = array (
   0 => 'ABCdatos BotLink',
   1 => 'Acme.Spider',
   2 => 'Ahoy! The Homepage Finder',

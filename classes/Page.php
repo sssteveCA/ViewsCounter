@@ -16,6 +16,7 @@ class Page implements PageError,Constants{
     private $title; //table title column
     private $url; //table url column
     private $n_views; //table number of views column(total views of specific page)
+    private $robots_list; //array that contains list of robots to avoid while view counting
     private $userAgent; 
     private $user_logged; //true if visitors is a logged user
     private $session_array; //array from $_SESSION that contains user visited pages
@@ -49,6 +50,7 @@ class Page implements PageError,Constants{
         //Don't send a SQL query
         else{
             $this->page_id = isset($args['page_id']) ? $args['page_id'] : null;
+            $this->robots_list = isset($args['robots_list']) ? $args['robots_list'] : array();
             $this->session_array = isset($args['session_array']) ? $args['session_array'] : array();
             $this->title = isset($args['title']) ? $args['title'] : null;
             $this->url = isset($args['url']) ? $args['url'] : null;
@@ -78,6 +80,7 @@ SQL;
     public function getViews(){return $this->n_views;}
     public function getQuery(){return $this->query;}
     public function getQueries(){return $this->queries;}
+    public function getRobotsList(){return $this->robots_list;}
     public function getUserAgent(){return $this->userAgent;}
     public function getSessionArray(){return $this->session_array;}
     public function getErrno(){return $this->errno;}
@@ -109,16 +112,22 @@ SQL;
 
     //check if visitor is a bot/crawler/spider
     private function isRobot(){
-        $robot = false;
+        $isRobot = false;
         $this->errno = 0;
         //$rList is the array in robotsList.php that contains list of robots to exclude from views counting
-        if(isset($rList)){
-            $log = "funzione isRobot() di Page";
+        if(isset($this->robots_list)){
+            $log = "funzione isRobot() di Page\r\n";
             file_put_contents(Page::$logDir,$log,FILE_APPEND);
-            foreach($rList as $robot){
+            foreach($this->robots_list as $robot){
+                $log = "foreach robot => {$robot}\r\n";
+                file_put_contents(Page::$logDir,$log,FILE_APPEND);
                 $Ebot = preg_quote($robot,'/');
+                $log = "foreach Ebot => {$Ebot}\r\n";
+                file_put_contents(Page::$logDir,$log,FILE_APPEND);
                 if(preg_match('/'.$Ebot.'/i',$this->userAgent)){
-                    $robot = true;
+                    $log = "preg_match di {$Ebot} con {$this->userAgent}\r\n";
+                    file_put_contents(Page::$logDir,$log,FILE_APPEND);
+                    $isRobot = true;
                     break;
                 }
             }
@@ -128,7 +137,7 @@ SQL;
             $log = "Page isRobot() no robots list\r\n";
             file_put_contents(Page::$logDir,$log,FILE_APPEND);
         }
-        return $robot;
+        return $isRobot;
     }
 
     public function setSessionArray($session_array){$this->session_array = $session_array;}
@@ -139,7 +148,12 @@ SQL;
     public function countableView(){
         $countable = false;
         $this->errno = 0;
-        if(!$this->isRobot()){
+        $log = "Page countableViews()\r\n";
+        file_put_contents(Page::$logDir,$log,FILE_APPEND);
+        $robot = $this->isRobot();
+        $log = "Page countableViews() robots => {$robot}\r\n";
+        file_put_contents(Page::$logDir,$log,FILE_APPEND);
+        if(!$robot){
             //Visitors is not a crawler
             if(!$this->user_logged && in_array($this->page_id,$this->session_array) && $this->page_id != 0)
             {

@@ -32,10 +32,7 @@ $logDir = ABSPATH.'/wp-content/viewsCounterLog.txt';
 
 add_action('wp_footer','vc_count');
 function vc_count(){
-    global $logDir;
-    $log = "VCCOUNT\r\n";
-    file_put_contents($logDir,$log,FILE_APPEND);
-    global $post;
+    global $logDir,$post,$rList;
     $url = $_SERVER['REQUEST_URI'];
     $pageA = array(
         'page_id' => $post->ID,
@@ -44,8 +41,21 @@ function vc_count(){
         'url' => $url,
         'user_logged' => is_user_logged_in()    
     );
+    $log = "vc_count rList => ".var_export($rList,true)."\r\n";
+    //file_put_contents($logDir,$log,FILE_APPEND);
+    if(isset($rList)){
+        $pageA['robots_list'] = $rList;
+        $log = "vc_count robots_list esiste\r\n";
+        file_put_contents($logDir,$log,FILE_APPEND);
+    }
+    else{
+        $log = "vc_count robots_list non esiste\r\n";
+        file_put_contents($logDir,$log,FILE_APPEND);
+    }
     try{
         $page = new Page($pageA);
+        $log = "vc_count User Agent => ".var_export($page->getUserAgent(),true)."\r\n";
+        file_put_contents($logDir,$log,FILE_APPEND);
         $count = $page->countableView();
         if($count){
             $_SESSION['pages'][] = $page->getSessionArray();

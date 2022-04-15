@@ -81,8 +81,7 @@ SQL;
         $this->errno = 0;
         $this->query = $this->wpdb->prepare("SELECT * FROM `{$this->table}` WHERE `id` = %d",$id);
         $pageData = $this->wpdb->get_results($this->query,ARRAY_A);
-        $log = "";
-        $log .= "pageData => ".var_export($pageData,true)."\r\n";
+        $log = "pageData => ".var_export($pageData,true)."\r\n";
         //file_put_contents(Vc_contatore::$logDir,$log,FILE_APPEND);
         if($pageData !== null){
             $page = new Page($pageData[0]);
