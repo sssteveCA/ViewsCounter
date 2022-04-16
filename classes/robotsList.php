@@ -12,6 +12,8 @@ class RobotsList implements Constants,RobotsListError{
     private static $url = Constants::URL_ROBOTS; 
     //Regular expression to extract the robots from html <ol> list
     private static $expr = '/<li><a href=".+">(.+)<\/a><\/li>/i';
+    //Array of robots list file
+    private static $file = Constants::ROBOTS_FILE;
 
     private $curl; //cURL handle
     private $curlOptions; //cURL options array
@@ -43,9 +45,12 @@ class RobotsList implements Constants,RobotsListError{
         $call = $this->cUrlCall();
         if($call){
             //cUrl returns a string response
-
-        }
-    }
+            $parse = $this->parseResponse();
+            if($parse){
+                $this->writeToFile();
+            }//if($parse){
+        }//if($call){
+    }//public function __construct()
 
     public function getCurlResponse(){return $this->curlR;}
     public function getCurlInfo(){return $this->curlInfo;}
@@ -65,6 +70,9 @@ class RobotsList implements Constants,RobotsListError{
                 break;
             case RobotsListError::NOMATCHES:
                 $this->error = RobotsListError::NOMATCHES_MSG;
+                break;
+            case RobotsListError::FILEWRITING:
+                $this->error = RobotsListError::FILEWRITING_MSG;
                 break;
             default:
                 $this->error = null;
@@ -123,6 +131,19 @@ class RobotsList implements Constants,RobotsListError{
         return $ok;
     }
 
+    //Put the array in a file
+    private function writeToFile(){
+        $ok = false; //true if array content is written successfully
+        $file_content = "<?php\r\n".'$rList = '.var_export($this->robots,true).';'."\r\n?>";
+        $put = file_put_contents(RobotsList::$file,$file_content);
+        if($put !== false){
+            //Data put on the file
+            $ok = true;
+        }
+        else
+            $this->errno = RobotsListError::FILEWRITING;
+        return $ok;
+    }
 
 }
 
