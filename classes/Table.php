@@ -88,7 +88,7 @@ CREATE TABLE `{$this->table}` (
 SQL;
         $this->queries[] = $this->query;
         $log = dbDelta($this->query);
-        file_put_contents(Table::$logDir,"Table DbDelta => ".var_export($log,true)."\r\n",FILE_APPEND);
+        //file_put_contents(Table::$logDir,"Table DbDelta => ".var_export($log,true)."\r\n",FILE_APPEND);
         $activated = true;
         return $activated;
     }
@@ -103,11 +103,11 @@ SQL;
         $this->queries[] = $this->query;
         $delete = $this->wpdb->query($this->query);
         if($delete == true){
-            file_put_contents(Table::$logDir,"Table uninistall tabella eliminata",FILE_APPEND);
+            //file_put_contents(Table::$logDir,"Table uninistall tabella eliminata",FILE_APPEND);
             $uninstalled = true;
         }
         else{
-            file_put_contents(Table::$logDir,"Table uninistall tabella non eliminata",FILE_APPEND);
+            //file_put_contents(Table::$logDir,"Table uninistall tabella non eliminata",FILE_APPEND);
             $this->errno = TableError::NOTREMOVED;
         }
         return $uninstalled;

@@ -41,15 +41,15 @@ function vc_count(){
         'url' => $url,
         'user_logged' => is_user_logged_in()    
     );
-    file_put_contents($logDir,"vc_count pageA => ".var_export($pageA,true)."\r\n",FILE_APPEND);
+    //file_put_contents($logDir,"vc_count pageA => ".var_export($pageA,true)."\r\n",FILE_APPEND);
     //file_put_contents($logDir,"vc_count SESSION prima => ".var_export($_SESSION['pages'],true)."\r\n",FILE_APPEND);
     //file_put_contents($logDir, "vc_count rList => ".var_export($rList,true)."\r\n",FILE_APPEND);
     if(isset($rList)){
         $pageA['robots_list'] = $rList;
-        file_put_contents($logDir,"vc_count robots_list esiste\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"vc_count robots_list esiste\r\n",FILE_APPEND);
     }
     else{
-        file_put_contents($logDir,"vc_count robots_list non esiste\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"vc_count robots_list non esiste\r\n",FILE_APPEND);
     }
     try{
         $page = new Page($pageA);
@@ -62,11 +62,11 @@ function vc_count(){
         else{
             $error = $page->getError();
             $log = "vc_count count error => {$error}\r\n";
-            file_put_contents($logDir,"vc_count count error => {$error}\r\n",FILE_APPEND);
+            //file_put_contents($logDir,"vc_count count error => {$error}\r\n",FILE_APPEND);
         }
     }
     catch(Exception $e){
-        file_put_contents($logDir,"Errore Page: ".$e->getMessage()."\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"Errore Page: ".$e->getMessage()."\r\n",FILE_APPEND);
     } 
 }
 
@@ -101,14 +101,14 @@ function vc_register_my_session()
     $session_id = session_id();
     if( !$session_id )
     {
-        file_put_contents($logDir,"vc_register_my_session() session id non esiste\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"vc_register_my_session() session id non esiste\r\n",FILE_APPEND);
         if(!isset($_SESSION['pages'])){
             $_SESSION['pages'] = array();
         }
     }
     else{
-        file_put_contents($logDir,"vc_register_my_session() session id esiste\r\n",FILE_APPEND);
-        file_put_contents($logDir,"vc_register_my_session() session id {$session_id}\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"vc_register_my_session() session id esiste\r\n",FILE_APPEND);
+        //file_put_contents($logDir,"vc_register_my_session() session id {$session_id}\r\n",FILE_APPEND);
     }
 }
 
@@ -121,11 +121,11 @@ function vc_total(){
         //get html shortcode 
         $str = $cont->shortcode();
         if($cont->getErrno() != 0){
-            file_put_contents($logDir,$cont->getError()."\r\n",FILE_APPEND);
+            //file_put_contents($logDir,$cont->getError()."\r\n",FILE_APPEND);
         }
     }
     catch(Exception $e){
-        file_put_contents($logDir,$e->getMessage()."\r\n",FILE_APPEND);
+        //file_put_contents($logDir,$e->getMessage()."\r\n",FILE_APPEND);
     }
     return $str;
 }

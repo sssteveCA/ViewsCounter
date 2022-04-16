@@ -116,13 +116,13 @@ SQL;
         $this->errno = 0;
         //$rList is the array in robotsList.php that contains list of robots to exclude from views counting
         if(isset($this->robots_list)){
-            file_put_contents(Page::$logDir,"funzione isRobot() di Page\r\n",FILE_APPEND);
+            //file_put_contents(Page::$logDir,"funzione isRobot() di Page\r\n",FILE_APPEND);
             foreach($this->robots_list as $robot){
                 //file_put_contents(Page::$logDir,"foreach robot => {$robot}\r\n",FILE_APPEND);
                 $Ebot = preg_quote($robot,'/');
                 //file_put_contents(Page::$logDir,"foreach Ebot => {$Ebot}\r\n",FILE_APPEND);
                 if(preg_match('/'.$Ebot.'/i',$this->userAgent)){
-                    file_put_contents(Page::$logDir,"preg_match di {$Ebot} con {$this->userAgent}\r\n",FILE_APPEND);
+                    //file_put_contents(Page::$logDir,"preg_match di {$Ebot} con {$this->userAgent}\r\n",FILE_APPEND);
                     $isRobot = true;
                     break;
                 }
@@ -143,9 +143,9 @@ SQL;
     public function countableView(){
         $countable = false;
         $this->errno = 0;
-        file_put_contents(Page::$logDir,"Page countableViews()\r\n",FILE_APPEND);
+        //file_put_contents(Page::$logDir,"Page countableViews()\r\n",FILE_APPEND);
         $robot = $this->isRobot();
-        file_put_contents(Page::$logDir,"Page countableViews() robots => {$robot}\r\n",FILE_APPEND);
+        //file_put_contents(Page::$logDir,"Page countableViews() robots => {$robot}\r\n",FILE_APPEND);
         if(!$robot){
             //Visitors is not a crawler
             if(!$this->user_logged && !in_array($this->page_id,$this->session_array) && $this->page_id != 0)
@@ -153,9 +153,9 @@ SQL;
                 //If user is not logged and the page isn't already visited in this session
                 $insert = $this->insertRow();
                 if($insert){
-                    file_put_contents(Page::$logDir,"Page countableViews() session_array prima => ".var_export($this->session_array,true)."\r\n",FILE_APPEND);
+                    //file_put_contents(Page::$logDir,"Page countableViews() session_array prima => ".var_export($this->session_array,true)."\r\n",FILE_APPEND);
                     array_push($this->session_array,$this->page_id);
-                    file_put_contents(Page::$logDir,"Page countableViews() session_array dopo => ".var_export($this->session_array,true)."\r\n",FILE_APPEND);
+                    //file_put_contents(Page::$logDir,"Page countableViews() session_array dopo => ".var_export($this->session_array,true)."\r\n",FILE_APPEND);
                     $countable = true;
                 }//if($insert){
             }//if(!$this->user_logged && !in_array($this->page_id,$this->session_array) && $this->page_id != 0){
@@ -179,10 +179,9 @@ SELECT * FROM `{$this->table}` WHERE `id` = {$this->id};
 SQL;
         $this->queries[] = $this->query;
         $result = $this->wpdb->get_results($this->query,ARRAY_A);
-        $logDir = ABSPATH.'wp-content/plugins/viewsCounterClass/log.txt';
-        $log = "Pagina Query =>".$this->query."\r\n";
+        /* $log = "Pagina Query =>".$this->query."\r\n";
         $log .= var_export($result,true)."\r\n";
-        file_put_contents($logDir,$log,FILE_APPEND);
+        file_put_contents(Page::$logDir,$log,FILE_APPEND); */
         if($result !== null){
             $this->page_id = $result[0]['page_id'];
             $this->title = $result[0]['title'];

@@ -143,7 +143,7 @@ SQL;
         $this->query = $this->wpdb->prepare("SELECT * FROM `{$this->table}` WHERE `url` = '%s",$url);
         $this->queries[] = $this->query;
         $pageData = $this->wpdb->get_results($this->query,ARRAY_A);
-        file_put_contents(Counter::$logDir,"Counter. php getPage ByUrl pageData => ".var_export($pageData,true)."\r\n",FILE_APPEND);
+        //file_put_contents(Counter::$logDir,"Counter. php getPage ByUrl pageData => ".var_export($pageData,true)."\r\n",FILE_APPEND);
         if($pageData != null){
             $page = new Page($pageData[0]);
         }
