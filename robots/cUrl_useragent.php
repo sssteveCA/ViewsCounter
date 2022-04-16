@@ -1,8 +1,11 @@
 <?php
 
-require_once('../interfaces/Constants.php');
+require_once('../interfaces/constants.php');
+require_once('../interfaces/robotsListError.php');
+require_once('../classes/robotsList.php');
 
 use ViewsCounter\Interfaces\Constants;
+use ViewsCounter\Classes\RobotsList;
 
 $msg = "";
 $cUrl = curl_init();
