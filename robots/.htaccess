@@ -1,4 +1,4 @@
 <Files cUrl_useragent.php>
-    Order deny,allow
+    Order Deny,Allow
     Deny from all
 </Files>
