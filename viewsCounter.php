@@ -13,14 +13,14 @@
 
 
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-require_once('interfaces/Constants.php');
-require_once('interfaces/PageError.php');
-require_once('interfaces/CounterError.php');
-require_once('interfaces/TableError.php');
+require_once('interfaces/constants.php');
+require_once('interfaces/pageError.php');
+require_once('interfaces/counterError.php');
+require_once('interfaces/tableError.php');
 include_once('robots/robotsList.php');
-require_once('classes/Page.php');
-require_once('classes/Counter.php');
-require_once('classes/Table.php');
+require_once('classes/page.php');
+require_once('classes/counter.php');
+require_once('classes/table.php');
 
 use ViewsCounter\Interfaces\Constants;
 use ViewsCounter\Classes\Counter;

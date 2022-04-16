@@ -2,7 +2,6 @@
 
 namespace ViewsCounter\Classes;
 
-use ViewsCounter\Classes\RobotsList as ClassesRobotsList;
 use ViewsCounter\Interfaces\RobotsListError;
 use ViewsCounter\Interfaces\Constants;
 
