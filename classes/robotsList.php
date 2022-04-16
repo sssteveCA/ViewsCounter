@@ -96,7 +96,7 @@ class RobotsList implements Constants,RobotsListError{
             $this->curlError = curl_error($this->curl);
         }
         $this->curlInfo = curl_getinfo($this->curl);
-        curl_close($this->close);
+        curl_close($this->curl);
         return $ok;
     }
 

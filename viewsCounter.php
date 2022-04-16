@@ -17,7 +17,7 @@ require_once('interfaces/constants.php');
 require_once('interfaces/pageError.php');
 require_once('interfaces/counterError.php');
 require_once('interfaces/tableError.php');
-include_once('robots/robotsList.php');
+include_once('robots/_robotsList.php');
 require_once('classes/page.php');
 require_once('classes/counter.php');
 require_once('classes/table.php');

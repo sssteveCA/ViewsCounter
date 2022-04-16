@@ -15,22 +15,25 @@ $robotsList = new RobotsList();
 $errno = $robotsList->getErrno();
 if($errno == 0){
     //No error
-    $msg .= Constants::MSG_ROBOTSLISTOK."\r\n";
+    $msg .= Constants::MSG_ROBOTSLISTOK."<br><br><br><br>";
 }//if($errno == 0){
 else{
-    $msg .= $robotsList->getError()."\r\n";
+    $msg .= $robotsList->getError()."<br>";
     if($errno == RobotsListError::CURL){
         $curlErrno = $robotsList->getCurlErrno();
         $curlError = $robotsList->getCurlError();
-        $msg .= "Codice errore: {$curlErrno}\r\nMessaggio di errore: {$curlError}\r\n";
+        $msg .= "Codice errore: {$curlErrno}<br>Messaggio di errore: {$curlError}<br><br><br><br>";
     }
 }//else di if($errno == 0){
 
 $curlInfo = $robotsList->getCurlInfo();
 if($curlInfo !== false){
+    $msg .= Constants::MSG_CURLINFODESC."<br><br>";
   /*last cUrl session info*/ 
   foreach($curlInfo as $option => $value){
-      $msg .= "{$option}: {$value}\r\n";
+      if(!is_array($value)){
+        $msg .= "{$option}: {$value}<br>";
+      }
   } 
 }
 
