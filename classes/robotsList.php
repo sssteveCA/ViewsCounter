@@ -17,6 +17,7 @@ class RobotsList implements Constants,RobotsListError{
     private $curlOptions; //cURL options array
     private $curlR; //cURL string response
     private $curlInfo; //array of information of last cURL session
+    private $robots; //list of all crawler finded
     private $errno; //error code
     private $error; //error message
     private $curlErrno; //error code of last cURL session
@@ -34,10 +35,16 @@ class RobotsList implements Constants,RobotsListError{
         $this->curl = null;
         $this->curlR = null;
         $this->curlInfo = false; //On failure this array is false
+        $this->robots = array();
         $this->errno = 0;
         $this->error = null;
         $this->curlErrno = 0; //No cURL error code
         $this->curlError = ''; //Empty string if cUrl session has no errors
+        $call = $this->cUrlCall();
+        if($call){
+            //cUrl returns a string response
+
+        }
     }
 
     public function getCurlResponse(){return $this->curlR;}
@@ -47,8 +54,17 @@ class RobotsList implements Constants,RobotsListError{
     public function getErrno(){return $this->errno;}
     public function getError(){
         switch($this->errno){
-            case RobotsListError::CURLERROR:
-                $this->error = RobotsListError::CURLERROR_MSG;
+            case RobotsListError::CURL:
+                $this->error = RobotsListError::CURL_MSG;
+                break;
+            case RobotsListError::PARSE:
+                $this->error = RobotsListError::PARSE_MSG;
+                break;
+            case RobotsListError::REGULAREXPRESSION:
+                $this->error = RobotsListError::REGULAREXPRESSION_MSG;
+                break;
+            case RobotsListError::NOMATCHES:
+                $this->error = RobotsListError::NOMATCHES_MSG;
                 break;
             default:
                 $this->error = null;
@@ -68,12 +84,42 @@ class RobotsList implements Constants,RobotsListError{
             $ok = true;
         }//if($this->curlR !== false){
         else{
-            $this->errno = RobotsListError::CURLERROR;
+            $this->errno = RobotsListError::CURL;
             $this->curlErrno = curl_errno($this->curl);
             $this->curlError = curl_error($this->curl);
         }
         $this->curlInfo = curl_getinfo($this->curl);
         curl_close($this->close);
+        return $ok;
+    }
+
+    //Extract crawlers list from HTML
+    private function parseResponse(){
+        $ok = false; //true if
+        //substring that start with '<ol>'
+        $olStart = strstr((string)$this->curlR,'<ol>');
+        if($olStart !== false){
+            //Portion of olStart string that ends with </ol>
+            $olContent = strstr($olStart,'</ol>',true);
+            if($olContent !== false){
+                $robots = preg_match_all(RobotsList::$expr,$olContent,$robotsList,PREG_PATTERN_ORDER);
+                if($robots !== false){
+                    if($robots > 0){
+                        //At least one pattern matches
+                        $this->robots = $robotsList[1];
+                        $ok = true;
+                    }//if($robots > 0){
+                    else
+                        $this->errno = RobotsListError::NOMATCHES;
+                }//if($robots !== false){
+                else
+                    $this->errno = RobotsListError::REGULAREXPRESSION;
+            }//if($olContent !== false){
+            else
+                $this->errno = RobotsListError::PARSE;
+        }//if($olStart !== false){
+        else
+            $this->errno = RobotsListError::PARSE;
         return $ok;
     }
 
